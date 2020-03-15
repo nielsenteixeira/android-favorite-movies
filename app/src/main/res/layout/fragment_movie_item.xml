@@ -44,9 +44,17 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/movie_year"
+                android:id="@+id/movie_vote"
                 android:layout_toRightOf="@+id/movie_image"
                 android:layout_below="@+id/movie_name"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/movie_overview"
+                android:layout_toRightOf="@+id/movie_image"
+                android:layout_below="@+id/movie_vote"
                 />
 
         </RelativeLayout>

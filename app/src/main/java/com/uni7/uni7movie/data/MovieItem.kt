@@ -1,8 +1,9 @@
 package com.uni7.uni7movie.data
 
-class MovieItem internal constructor (
+class MovieItem (
     var id: Int,
-    var name: String,
-    var image_url: String,
-    var year: String
+    var title: String,
+    var vote_average: Double,
+    var poster_path: String,
+    var overview: String
 )

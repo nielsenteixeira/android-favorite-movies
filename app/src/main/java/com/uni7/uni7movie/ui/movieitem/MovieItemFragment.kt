@@ -8,13 +8,20 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.uni7.uni7movie.R
 import com.uni7.uni7movie.data.MovieItem
+import com.uni7.uni7movie.data.MoviesResult
+import com.uni7.uni7movie.service.NetworkUtils
+import com.uni7.uni7movie.service.TheMoviesDBService
+import retrofit2.Call
+import retrofit2.Response
 
 
 class MovieItemFragment : Fragment() {
 
     private var columnCount = 1
+    private val httpStatusNotFound = 404
 
     private var listener: OnListFragmentInteractionListener? = null
 
@@ -31,8 +38,6 @@ class MovieItemFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_movie_item_list, container, false)
-
-        // Set the adapter
         if (view is RecyclerView) {
 
             with(view) {
@@ -41,59 +46,37 @@ class MovieItemFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter =
-                    MovieItemRecyclerViewAdapter(
-                        getMovies()
-                    )
             }
+
+            loadMovies(view)
         }
+
+
         return view
     }
 
-    private fun getMovies(): ArrayList<MovieItem> {
-        val movies = ArrayList<MovieItem>()
-        movies.add(
-            MovieItem(
-                1,
-                "The Shawshank Redemption",
-                "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9fSGtPOp3MlFfynLEjYjlOfenbk.jpg",
-                "1994"
-            )
-        )
-        movies.add(
-            MovieItem(
-                2,
-                "The Godfather",
-                "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9fSGtPOp3MlFfynLEjYjlOfenbk.jpg",
-                "1972"
-            )
-        )
-        movies.add(
-            MovieItem(
-                3,
-                "Forrest Gump",
-                "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9fSGtPOp3MlFfynLEjYjlOfenbk.jpg",
-                "1994"
-            )
-        )
-        movies.add(
-            MovieItem(
-                4,
-                "Forrest Gump",
-                "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9fSGtPOp3MlFfynLEjYjlOfenbk.jpg",
-                "1994"
-            )
-        )
-        movies.add(
-            MovieItem(
-                5,
-                "Forrest Gump",
-                "https://image.tmdb.org/t/p/w600_and_h900_bestv2/9fSGtPOp3MlFfynLEjYjlOfenbk.jpg",
-                "1994"
-            )
-        )
+    private fun loadMovies(view: RecyclerView) {
+        val retrofitClient = NetworkUtils
+            .getRetrofitInstance("https://api.themoviedb.org/")
 
-        return movies
+        val endpoint = retrofitClient.create(TheMoviesDBService::class.java)
+        val callback = endpoint.getMovies()
+        callback.enqueue(object: retrofit2.Callback<MoviesResult?> {
+            override fun onFailure(call: Call<MoviesResult?>, t: Throwable) {
+                Snackbar.make(view, "Falha ao carregar filmes!", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show()
+            }
+
+            override fun onResponse(call: Call<MoviesResult?>, response: Response<MoviesResult?>) {
+                if (response.code() == httpStatusNotFound) {
+                    view.adapter = MovieItemRecyclerViewAdapter(listOf())
+                } else {
+                    response.body()?.let {
+                        val movies: List<MovieItem> = it.results
+                        view.adapter = MovieItemRecyclerViewAdapter(movies)
+                    }
+                }
+            }
+        })
     }
 
     override fun onDetach() {
@@ -102,16 +85,11 @@ class MovieItemFragment : Fragment() {
     }
 
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun onListFragmentInteraction(item: MovieItem?)
     }
 
     companion object {
-
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
-
-        // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
             MovieItemFragment().apply {
