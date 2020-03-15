@@ -1,6 +1,7 @@
 package com.uni7.uni7movie.ui.movieitem
 
-import android.util.Log
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,13 +9,20 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
+import com.uni7.uni7movie.MovieActivity
 import com.uni7.uni7movie.R
 import com.uni7.uni7movie.data.MovieItem
-import com.uni7.uni7movie.movieitem.DownloadImageTask
 
 
-class MovieItemRecyclerViewAdapter internal constructor(private var movies: List<MovieItem>) :
+class MovieItemRecyclerViewAdapter internal constructor(
+    private var movies: List<MovieItem>
+) :
     RecyclerView.Adapter<MovieItemRecyclerViewAdapter.MovieViewHolder>() {
+
+    private var context: Context? = null
+
+    val baseImageUrl = "https://image.tmdb.org/t/p/w500"
 
     class MovieViewHolder internal constructor(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -31,6 +39,11 @@ class MovieItemRecyclerViewAdapter internal constructor(private var movies: List
             movieOverview = itemView.findViewById<View>(R.id.movie_overview) as TextView
             movieImage = itemView.findViewById<View>(R.id.movie_image) as ImageView
         }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        context = recyclerView.context
     }
 
     override fun getItemCount(): Int {
@@ -53,14 +66,13 @@ class MovieItemRecyclerViewAdapter internal constructor(private var movies: List
         movieViewHolder.movieName.text = movies[i].title
         movieViewHolder.movieVote.text = movies[i].vote_average.toString()
         movieViewHolder.movieOverview.text = getCroppedOverview(movies[i].overview)
-        DownloadImageTask(movieViewHolder.movieImage).execute("https://image.tmdb.org/t/p/w500" + movies[i].poster_path)
+        Picasso.get().load(baseImageUrl + movies[i].poster_path).into(movieViewHolder.movieImage)
 
 
         movieViewHolder.cv.setOnClickListener(View.OnClickListener {
-            Log.d(
-                "Tag",
-                "Cardview clicked" + movies[i].title
-            )
+            val intent = Intent(context, MovieActivity::class.java)
+            intent.putExtra("MOVIE_ID", movies[i].id)
+            context!!.startActivity(intent)
         })
     }
 

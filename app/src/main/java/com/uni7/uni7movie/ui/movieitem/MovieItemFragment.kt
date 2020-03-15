@@ -22,7 +22,6 @@ class MovieItemFragment : Fragment() {
 
     private var columnCount = 1
     private val httpStatusNotFound = 404
-
     private var listener: OnListFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +56,7 @@ class MovieItemFragment : Fragment() {
 
     private fun loadMovies(view: RecyclerView) {
         val retrofitClient = NetworkUtils
-            .getRetrofitInstance("https://api.themoviedb.org/")
+            .getRetrofitInstance()
 
         val endpoint = retrofitClient.create(TheMoviesDBService::class.java)
         val callback = endpoint.getMovies()

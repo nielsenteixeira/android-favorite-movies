@@ -30,7 +30,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="16dp"
-                />
+               />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -41,11 +41,20 @@
                 android:textSize="25sp"
                 />
 
+            <ImageView
+                android:id="@+id/movie_rate"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_toRightOf="@+id/movie_image"
+                android:layout_below="@+id/movie_name"
+                app:srcCompat="@android:drawable/btn_star_big_on"
+                />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/movie_vote"
-                android:layout_toRightOf="@+id/movie_image"
+                android:layout_toRightOf="@+id/movie_rate"
                 android:layout_below="@+id/movie_name"
                 />
 
